@@ -1,0 +1,12 @@
+fastapi
+uvicorn[standard]
+python-dotenv
+pydantic
+pydantic-settings
+pytest
+pytest-asyncio
+httpx
+openai
+requests
+e2b>=2.21.0
+sse-starlette
