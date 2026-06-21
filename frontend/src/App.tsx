@@ -3,15 +3,18 @@ import { Files, MessageSquare } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { Group as PanelGroup, Panel, Separator as PanelResizeHandle } from 'react-resizable-panels';
 
+import { ChatHistorySidebar } from '@/components/chat-history-sidebar';
 import { ChatPanel } from '@/components/chat-panel';
 import { ExplorerPanel } from '@/components/explorer-panel';
 import { MemoryDrawer } from '@/components/memory-drawer';
 import { SettingsDialog } from '@/components/settings-dialog';
 import { useAgentActions } from '@/hooks/use-agent-actions';
 import { useAgentStore } from '@/store/use-agent-store';
+import type { ChatHistory } from '@/types';
 
 function App() {
   const [loadingModels, setLoadingModels] = useState(false);
+  const [migrated, setMigrated] = useState(false);
   const {
     settings,
     isSettingsOpen,
@@ -34,6 +37,31 @@ function App() {
     setLoadingModels(true);
     void refreshModels().finally(() => setLoadingModels(false));
   }, [refreshModels, settings.nvidiaApiKey, settings.openrouterApiKey, settings.provider]);
+
+  useEffect(() => {
+    if (migrated) return;
+    const state = useAgentStore.getState();
+    if (state.messages.length > 0 && state.chatHistories.length === 0 && !state.activeChatId) {
+      const firstUserMessage = state.messages.find((m) => m.role === 'user');
+      const name = firstUserMessage
+        ? (firstUserMessage.content.length > 35
+            ? firstUserMessage.content.slice(0, 35) + '…'
+            : firstUserMessage.content)
+        : 'Chat';
+      const newChat: ChatHistory = {
+        id: crypto.randomUUID(),
+        name,
+        messages: state.messages,
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+      };
+      useAgentStore.setState({
+        chatHistories: [newChat],
+        activeChatId: newChat.id,
+      });
+    }
+    setMigrated(true);
+  }, [migrated]);
 
   const desktopLayout = useMemo(
     () => (
@@ -67,6 +95,7 @@ function App() {
       <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.02),transparent_24%)]" />
 
       <main className="relative h-screen w-screen overflow-hidden">
+        <ChatHistorySidebar />
         {desktopLayout}
 
         <div className="flex h-full flex-col md:hidden">

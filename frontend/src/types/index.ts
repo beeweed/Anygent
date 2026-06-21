@@ -67,3 +67,11 @@ export interface StreamEnvelope<T = Record<string, unknown>> {
   event: string;
   data: T;
 }
+
+export interface ChatHistory {
+  id: string;
+  name: string;
+  messages: AgentMessage[];
+  createdAt: number;
+  updatedAt: number;
+}

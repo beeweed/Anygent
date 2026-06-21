@@ -1,6 +1,6 @@
 import * as ScrollArea from '@radix-ui/react-scroll-area';
 import * as Tooltip from '@radix-ui/react-tooltip';
-import { Code2, HardDrive, RotateCcw, SendHorizontal, Settings2 } from 'lucide-react';
+import { Code2, HardDrive, Menu, RotateCcw, SendHorizontal, Settings2 } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import type { FormEvent, ReactNode } from 'react';
 
@@ -17,7 +17,7 @@ type ChatPanelProps = {
 
 export function ChatPanel({ onOpenSettings, onOpenMemory, onReset, onSend }: ChatPanelProps) {
   const [draft, setDraft] = useState('');
-  const { messages, iterationCurrent, iterationMax, isStreaming, settings } = useAgentStore();
+  const { messages, iterationCurrent, iterationMax, isStreaming, settings, setSidebarOpen } = useAgentStore();
 
   const blockingMessage = useMemo(() => {
     const providerKey = settings.provider === 'openrouter' ? settings.openrouterApiKey : settings.nvidiaApiKey;
@@ -39,6 +39,9 @@ export function ChatPanel({ onOpenSettings, onOpenMemory, onReset, onSend }: Cha
     <section className="flex h-full flex-col rounded-[28px] border border-white/6 bg-[#1e1e1e] shadow-[0_16px_80px_rgba(0,0,0,0.28)]">
       <header className="flex items-center justify-between border-b border-white/6 bg-[#252525] px-5 py-4">
         <div className="flex items-center gap-3">
+          <HeaderIconButton label="Toggle chat history" onClick={() => setSidebarOpen(true)}>
+            <Menu className="h-4.5 w-4.5" />
+          </HeaderIconButton>
           <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[linear-gradient(135deg,rgba(99,102,241,0.92),rgba(59,130,246,0.68))] shadow-[0_10px_30px_rgba(99,102,241,0.32)]">
             <Code2 className="h-5 w-5 text-white" />
           </div>
